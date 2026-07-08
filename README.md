@@ -105,5 +105,5 @@ nix fmt
 ### Running Tests
 
 ```sh
-dhall <<< './HTML/tests.dhall'
+echo './HTML/tests.dhall' | dhall
 ```

@@ -12,38 +12,23 @@ let HTML = https://raw.githubusercontent.com/fjij/dhall-html/main/HTML/package.d
 
 ### Building HTML
 
-Use `element` to create elements with attributes, and `textNode` for text content:
+Use `el` to create elements and `text` for text content:
 
 ```dhall
 let HTML = ./HTML/package.dhall
 
 let page =
-      HTML.element
+      HTML.el
         "html"
-        (toMap {=} : List { mapKey : Text, mapValue : Text })
-        [ HTML.element
-            "head"
-            (toMap {=} : List { mapKey : Text, mapValue : Text })
-            [ HTML.element
-                "title"
-                (toMap {=} : List { mapKey : Text, mapValue : Text })
-                [ HTML.textNode "My Page" ]
-            ]
-        , HTML.element
+        [ HTML.el "head" [ HTML.el "title" [ HTML.text "My Page" ] ]
+        , HTML.el
             "body"
-            (toMap {=} : List { mapKey : Text, mapValue : Text })
-            [ HTML.element
-                "h1"
-                (toMap {=} : List { mapKey : Text, mapValue : Text })
-                [ HTML.textNode "Hello, World!" ]
+            [ HTML.el "h1" [ HTML.text "Hello, World!" ]
             , HTML.element
                 "a"
                 (toMap { href = "https://example.com" })
-                [ HTML.textNode "Click here" ]
-            , HTML.element
-                "br"
-                (toMap {=} : List { mapKey : Text, mapValue : Text })
-                ([] : List HTML.Type)
+                [ HTML.text "Click here" ]
+            , HTML.el "br" ([] : List HTML.Type)
             ]
         ]
 
@@ -71,20 +56,32 @@ This produces:
 </html>
 ```
 
+When you need attributes, use `element` with an attribute map:
+
+```dhall
+let HTML = ./HTML/package.dhall
+
+in  HTML.element
+      "input"
+      (toMap { type = "text", placeholder = "Enter name" })
+      ([] : List HTML.Type)
+```
+
 ### API
 
 | Export     | Type | Description |
 |------------|------|-------------|
 | `Type`     | `Type` | The HTML type |
-| `element`  | `Text → Map Text Text → List HTML → HTML` | Create an element with a tag name, attributes, and children |
-| `textNode` | `Text → HTML` | Create a text node |
+| `Attrs`    | `Type` | The attributes type (`List { mapKey : Text, mapValue : Text }`) |
+| `el`       | `Text → List HTML → HTML` | Create an element with no attributes |
+| `element`  | `Text → Attrs → List HTML → HTML` | Create an element with attributes |
+| `text`     | `Text → HTML` | Create a text node |
 | `render`   | `Natural → HTML → Text` | Render HTML to text with the given indentation width |
 | `F`        | `Type → Type` | The base functor for the HTML type (for advanced use) |
 
 ### Notes
 
 - Self-closing tags: elements with no children render as self-closing (e.g. `<br />`).
-- Attributes: pass `(toMap {=} : List { mapKey : Text, mapValue : Text })` for no attributes, or `toMap { key = "value" }` for one or more.
 - Indentation: the `Natural` argument to `render` controls the number of spaces per indent level.
 
 ## Development
@@ -108,5 +105,5 @@ nix fmt
 ### Running Tests
 
 ```sh
-echo './HTML/tests.dhall' | dhall
+dhall <<< './HTML/tests.dhall'
 ```

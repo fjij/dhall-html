@@ -2,29 +2,27 @@ let HTML = ./Type.dhall
 
 let render = ./render.dhall
 
-let t = ./textNode.dhall
+let el = ./el.dhall
 
-let ea = ./element.dhall
+let text = ./textNode.dhall
 
-let e =
-      \(name : Text) ->
-        ea name (toMap {=} : List { mapKey : Text, mapValue : Text })
+let element = ./element.dhall
 
 let example0 =
         assert
       :     render
               2
-              ( e
+              ( el
                   "html"
-                  [ e "head" [ e "title" [ t "My Page" ] ]
-                  , e
+                  [ el "head" [ el "title" [ text "My Page" ] ]
+                  , el
                       "body"
-                      [ e "h1" [ t "My Page" ]
-                      , e "br" ([] : List HTML)
-                      , ea
+                      [ el "h1" [ text "My Page" ]
+                      , el "br" ([] : List HTML)
+                      , element
                           "a"
                           (toMap { href = "./other.html" })
-                          [ t "Other Page" ]
+                          [ text "Other Page" ]
                       ]
                   ]
               )
